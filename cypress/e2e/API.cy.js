@@ -48,6 +48,93 @@ describe('Petstore tests', () => {
     })
   })
 
+  it('Pet update', () => {
+    petUpdate.id = petId;
+    cy.request('PUT', '/pet', petUpdate).then (response =>{
+      console.log(response.allRequestResponses[0]["Request Body"]);
 
+      expect (response.statusText).to.be.equal('OK');
+
+      expect(response.body.id).to.be.equal(pet.id);
+      expect (response.body.name).to.be.equal(petUpdate.name);
+      expect (response.body.category.name).to.be.equal(petUpdate.category.name);
+
+      petId = response.body.id;
+
+    })
+  })
+
+  it('Update pet by id with form-data', () => {
+
+      cy.request({
+        method: 'POST',
+        url: `/pet/${petId}`, 
+        form: true, 
+        body: {
+          name: 'Murzik',
+          status: 'Sold',
+        },
+      }).then (response =>{
+        console.log(response.allRequestResponses[0]["Request Body"]);
+
+      expect (response.status).to.be.equal(200);
+      expect (response.body.message).to.be.equal(`${petId}`);
+    })
+
+      cy.request('GET', `/pet/${petId}`).then (response =>{
+        console.log(response.allRequestResponses[0]["Request Body"]);
+  
+        expect (response.status).to.be.equal(200);
+        expect(response.body.id).to.be.equal(petId);
+        expect(response.body.name).to.be.equal('Murzik');
+        expect (response.body.status).to.be.equal('Sold');
+        petStatus = response.body.status;
+        petName = response.body.name;
+    
+  })
+})
+
+it('Find pet by status', () => {
+
+  cy.request({
+    method: 'GET',
+    url: `/pet/findByStatus?status=${petStatus}`
+  }).then (response =>{
+    console.log(response.allRequestResponses[0]["Request Body"]);
+
+    expect (response.status).to.be.equal(200);
+    for (let i = 0; i<response.length; i++) {
+      if (response[i].body.id=petId) {
+        expect (response.body.name).to.be.equal(`${petName}`);
+        expect(response.body.status).to.be.equal(`${petStatus}`);
+      }
+   }
+    
+})
+})
+
+it(`Delete pet with id ${pet.id}`, () => {
+
+  cy.request({
+    method: 'DELETE',
+    url: `/pet/${petId}`,
+  }).then (response =>{
+    console.log(response.allRequestResponses[0]["Request Body"]);
+
+  expect (response.status).to.be.equal(200);
+  expect (response.body.message).to.be.equal(`${petId}`);
+})
+  cy.request({
+    method: 'GET',
+    url: `/pet/${petId}`,
+  failOnStatusCode: false
+}).then (response =>{
+    console.log(response.allRequestResponses[0]["Request Body"]);
+
+    expect (response.status).to.be.equal(404);
+    expect (response.body.message).to.be.equal('Pet not found');
+
+})
+})
 })
 
