@@ -79,8 +79,6 @@ describe('Petstore tests', () => {
 
       expect (response.status).to.be.equal(200);
       expect (response.body.message).to.be.equal(`${petId}`);
-    })
-
       cy.request('GET', `/pet/${petId}`).then (response =>{
         console.log(response.allRequestResponses[0]["Request Body"]);
   
@@ -92,6 +90,9 @@ describe('Petstore tests', () => {
         petName = response.body.name;
     
   })
+    })
+
+      
 })
 
 it('Find pet by status', () => {
@@ -123,7 +124,7 @@ it(`Delete pet with id ${pet.id}`, () => {
 
   expect (response.status).to.be.equal(200);
   expect (response.body.message).to.be.equal(`${petId}`);
-})
+
   cy.request({
     method: 'GET',
     url: `/pet/${petId}`,
@@ -135,6 +136,8 @@ it(`Delete pet with id ${pet.id}`, () => {
     expect (response.body.message).to.be.equal('Pet not found');
 
 })
+})
+  
 })
 })
 
