@@ -114,6 +114,27 @@ it('Find pet by status', () => {
 })
 })
 
+it('Download image', () => {
+
+  cy.fixture('LOGO.jpg','binary').then(
+    file =>{
+      const blob = Cypress.Blob.binaryStringToBlob(file, 'image/png') // mime type
+      let formData = new FormData();
+      
+      formData.append('additionalMetadata', 'qweqwe'); //додає новий рядок у форм-дату (як типу поставити галочку у форм-даті у постмені - ключ:значення)
+      formData.append('file', blob, 'LOGO.jpg');
+      cy.request({
+        method: 'POST',
+        url: `/pet/${petId}/uploadImage`,
+        body: formData
+    }).then(resp =>{
+      expect(resp.isOkStatusCode).to.be.true;
+    })
+  
+    
+})
+})
+
 it(`Delete pet with id ${pet.id}`, () => {
 
   cy.request({
@@ -137,6 +158,8 @@ it(`Delete pet with id ${pet.id}`, () => {
 
 })
 })
+
+
   
 })
 })
